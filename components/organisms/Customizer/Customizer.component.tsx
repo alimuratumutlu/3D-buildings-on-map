@@ -1,7 +1,7 @@
 import styles from "styles/Customizer.module.css";
 
 // Components
-import { FileUploader, SliderOption, Typography } from "@/components";
+import { FileSelector, SliderOption, Typography } from "@/components";
 
 // Hooks
 import useCustomizer from "hooks/useCustomizer";
@@ -14,12 +14,7 @@ export default function Customizer() {
 
 	return (
 		<div className={styles.container}>
-			<FileUploader />
-			<Typography>
-				You can import sample geojson file from <i>geojsonExamples</i> folder.
-				After upload, you will be able to fly to the building area and customize
-				it.
-			</Typography>
+			<FileSelector />
 			<Typography>{BUILDING_CUSTOMIZER_LABEL}</Typography>
 			{options.map((option) => {
 				return (
@@ -29,9 +24,10 @@ export default function Customizer() {
 						value={option.value}
 						onChange={(e, v) => option.onChange(e, v)}
 						max={option.max}
+						step={option.step}
 					/>
-				);
-			})}
+					);
+				})}
 		</div>
 	);
 }
