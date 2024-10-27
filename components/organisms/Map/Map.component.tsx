@@ -1,17 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
-  useContext,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  useEffect,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
 } from "react";
 import BuildingContext from "store/BuildingContext";
 
 // Components
-import DeckGL, { FlyToInterpolator } from "deck.gl";
 import { GeoJsonLayer } from "@deck.gl/layers";
+import DeckGL, { FlyToInterpolator } from "deck.gl";
 import { Map as MapUi } from "react-map-gl";
 
 interface initialViewStateProps {
@@ -79,28 +79,80 @@ export const Map = () => {
   }, [state.landingPolygon]);
 
   const BuildingLayer = useMemo(() => {
-    let layer = new GeoJsonLayer({
-      id: "building",
-      data: {
-        type: "Feature",
-        properties: {},
-        geometry: state.buildingPolygon,
-      },
-      filled: true,
-      stroked: true,
-      extruded: true,
-      getLineWidth: 5,
-      lineWidthUnits: "meters",
-      getElevation: state.floorHeight,
-      autoHighlight: true,
-      highlightColor: [100, 111, 255],
-      getFillColor: [160, 160, 180, 200],
-      getLineColor: [125, 125, 125],
-      getPointRadius: 100,
-      elevationScale: state.numberOfFloors,
-    });
+    if (!state.buildingPolygon.coordinates?.length) return [];
 
-    return layer;
+    // Create horizontal lines for each floor
+    const floorLines = [];
+    for (let floor = 1; floor < state.numberOfFloors; floor++) {
+      // Get the building polygon coordinates
+      const coordinates = state.buildingPolygon.coordinates[0][0];
+      
+      // Create a line feature at each floor height
+      const floorHeight = floor * state.floorHeight;
+      
+      // Create lines connecting each vertex of the polygon at the floor height
+      for (let i = 0; i < coordinates.length - 1; i++) {
+        floorLines.push({
+          type: "Feature",
+          properties: { height: floorHeight },
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [...coordinates[i], floorHeight],   // Start point with elevation
+              [...coordinates[i + 1], floorHeight] // End point with elevation
+            ]
+          }
+        });
+      }
+      
+      // Close the shape by connecting the last vertex to the first
+      floorLines.push({
+        type: "Feature",
+        properties: { height: floorHeight },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [...coordinates[coordinates.length - 1], floorHeight],
+            [...coordinates[0], floorHeight]
+          ]
+        }
+      });
+    }
+
+    return [
+      // Base building
+      new GeoJsonLayer({
+        id: "building-base",
+        data: {
+          type: "Feature",
+          properties: {},
+          geometry: state.buildingPolygon,
+        },
+        filled: true,
+        stroked: true,
+        extruded: true,
+        getElevation: state.floorHeight * state.numberOfFloors,
+        getFillColor: [160, 160, 180, 200],
+        getLineColor: [50, 50, 50],
+        getLineWidth: 1,
+        lineWidthUnits: "pixels",
+      }),
+      // Floor lines
+      new GeoJsonLayer({
+        id: "floor-lines",
+        data: floorLines,
+        stroked: true,
+        filled: false,
+        lineWidthUnits: "pixels",
+        getLineWidth: 2,
+        getLineColor: [30, 30, 30],
+        getElevation: (d: any) => (d as { properties: { height: number } }).properties.height,
+        parameters: {
+          depthTest: true,
+          lineWidthMinPixels: 1,
+        }
+      })
+    ];
   }, [state.buildingPolygon, state.floorHeight, state.numberOfFloors]);
 
   const mapRef = useRef(null);
@@ -111,7 +163,7 @@ export const Map = () => {
       ref={deckRef}
       controller={true}
       initialViewState={initialViewState}
-      layers={[LandingLayer, BuildingLayer]}
+      layers={[LandingLayer, ...BuildingLayer]}
     >
       <MapUi
         ref={mapRef}
