@@ -23,7 +23,7 @@ export default function Information() {
 				return (
 					<Typography key={option.label}>
 						{option.label}:{" "}
-						{option.calculatedValue ? option.calculatedValue : option.value}{" "}
+						{option.value}{" "}
 						{option.unit}
 					</Typography>
 				);

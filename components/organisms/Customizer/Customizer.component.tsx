@@ -24,7 +24,6 @@ export default function Customizer() {
 						value={option.value}
 						onChange={(e, v) => option.onChange(e, v)}
 						max={option.max}
-						step={option.step}
 					/>
 					);
 				})}
