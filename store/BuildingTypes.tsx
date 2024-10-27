@@ -5,7 +5,6 @@ export type Geojson = {
 };
 
 export type BuildingState = {
-  landingArea: number;
   floorArea: number;
   landingPolygon: Geojson;
   buildingPolygon: Geojson;
@@ -16,7 +15,6 @@ export type BuildingState = {
 
 export type BuildingContextType = {
   state: BuildingState;
-  setLandingArea: (landingArea: number) => void;
   setFloorArea: (floorArea: number) => void;
   setLandingPolygon: (landingPolygon: any) => void;
   setBuildingPolygon: (buildingPolygon: any) => void;
@@ -26,7 +24,6 @@ export type BuildingContextType = {
 };
 
 export type BuildingAction =
-  | { type: "SET_LANDING_AREA"; landingArea: number }
   | { type: "SET_FLOOR_AREA"; floorArea: number }
   | { type: "SET_LANDING_POLYGON"; landingPolygon: Geojson }
   | { type: "SET_BUILDING_POLYGON"; buildingPolygon: Geojson }

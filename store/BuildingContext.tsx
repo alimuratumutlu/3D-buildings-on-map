@@ -3,7 +3,6 @@ import { BuildingContextType } from "./BuildingTypes";
 
 const BuildingContext = createContext<BuildingContextType>({
   state: {
-    landingArea: 0,
     floorArea: 0,
     landingPolygon: { type: "", coordinates: [] },
     buildingPolygon: { type: "", coordinates: [] },
@@ -11,7 +10,6 @@ const BuildingContext = createContext<BuildingContextType>({
     numberOfFloors: 0,
     scaleRate: 1,
   },
-  setLandingArea: () => {},
   setFloorArea: () => {},
   setLandingPolygon: () => {},
   setBuildingPolygon: () => {},

@@ -21,10 +21,6 @@ export default function BuildingProvider({
 }) {
   const [state, dispatch] = useReducer(BuildingReducer, initialState);
 
-  const setLandingArea = (landingArea: number) => {
-    dispatch({ type: "SET_LANDING_AREA", landingArea });
-  };
-
   const setFloorArea = (floorArea: number) => {
     dispatch({ type: "SET_FLOOR_AREA", floorArea });
   };
@@ -53,7 +49,6 @@ export default function BuildingProvider({
     <BuildingContext.Provider
       value={{
         state,
-        setLandingArea,
         setFloorArea,
         setLandingPolygon,
         setBuildingPolygon,
